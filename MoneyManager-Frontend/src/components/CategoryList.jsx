@@ -2,7 +2,7 @@ import { Layers2, Pencil, Trash2 } from "lucide-react";
 
 const CategoryList = ({ categories, onEditCategory, onDeleteCategory }) => {
     return (
-        <div className="group relative flex items-center gap-4 mt-2 p-3 rounded-lg hover:bg-gray-100/60">
+        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-5 space-y-4">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h4 className="text-lg font-semibold">Category Sources</h4>
@@ -23,7 +23,7 @@ const CategoryList = ({ categories, onEditCategory, onDeleteCategory }) => {
                     {categories.map((category) => (
                         <div
                             key={category.id}
-                            className="group flex items-center gap-4 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all duration-200"
+                            className="group relative flex items-center gap-4 mt-2 p-3 rounded-lg hover:bg-gray-100/60"
                         >
                             {/* Icon */}
                             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-50">
