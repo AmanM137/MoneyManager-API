@@ -2,7 +2,7 @@ import { Layers2, Pencil, Trash2 } from "lucide-react";
 
 const CategoryList = ({ categories, onEditCategory, onDeleteCategory }) => {
     return (
-        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-5 space-y-4">
+        <div className="group relative flex items-center gap-4 mt-2 p-3 rounded-lg hover:bg-gray-100/60">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <h4 className="text-lg font-semibold">Category Sources</h4>
