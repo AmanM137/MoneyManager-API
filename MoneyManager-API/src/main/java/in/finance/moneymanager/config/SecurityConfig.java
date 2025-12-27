@@ -54,7 +54,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 //"http://localhost:5173"
-                "https://moneymanager20.netlify.app/login" // your deployed frontend domain
+                "https://moneymanager20.netlify.app" // your deployed frontend domain
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Accept", "Content-Type"));
