@@ -2,59 +2,63 @@ import { Layers2, Pencil, Trash2 } from "lucide-react";
 
 const CategoryList = ({ categories, onEditCategory, onDeleteCategory }) => {
     return (
-        <div className="card p-4">
-            <div className="flex items-center justify-between mb-4">
+        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-5 space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between">
                 <h4 className="text-lg font-semibold">Category Sources</h4>
             </div>
 
+            {/* No Categories */}
             {categories.length === 0 ? (
-                <p className="text-gray-500">
-                    No categories added yet. Add some to get started!
-                </p>
+                <div className="h-[150px] flex flex-col items-center justify-center text-center text-gray-500 border border-dashed border-gray-200 rounded-lg mt-4">
+                    <Layers2 size={36} className="text-purple-400 mb-2" />
+                    <p className="font-medium text-gray-700">No categories added yet</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                        Add some categories to get started!
+                    </p>
+                </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                /* Categories Grid */
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
                     {categories.map((category) => (
                         <div
                             key={category.id}
-                            className="group relative flex items-center gap-4 p-3 rounded-lg hover:bg-gray-100/60 transition-all duration-200"
+                            className="group flex items-center gap-4 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all duration-200"
                         >
                             {/* Icon */}
-                            <div className="w-12 h-12 flex items-center justify-center text-xl text-gray-800 bg-gray-100 rounded-full">
+                            <div className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-50">
                                 {category.icon ? (
-                                    <span className="text-2xl">
-                                        <img
-                                            src={category.icon}
-                                            alt={category.name}
-                                            className="h-5 w-5"
-                                        />
-                                    </span>
+                                    <img
+                                        src={category.icon}
+                                        alt={category.name}
+                                        className="h-6 w-6 object-contain"
+                                    />
                                 ) : (
-                                    <Layers2 className="text-purple-800" size={24} />
+                                    <Layers2 className="text-purple-700" size={22} />
                                 )}
                             </div>
 
-                            {/* Details */}
+                            {/* Details & Actions */}
                             <div className="flex-1 flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm text-gray-700 font-medium">
+                                    <p className="text-sm font-semibold text-gray-800">
                                         {category.name}
                                     </p>
-                                    <p className="text-sm text-gray-400 mt-1 capitalize">
+                                    <p className="text-xs text-gray-500 capitalize">
                                         {category.type}
                                     </p>
                                 </div>
 
-                                {/* Actions */}
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => onEditCategory(category)}
-                                        className="text-gray-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                        className="text-gray-400 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                                     >
                                         <Pencil size={18} />
                                     </button>
                                     <button
                                         onClick={() => onDeleteCategory(category.id)}
-                                        className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                        className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                                     >
                                         <Trash2 size={18} />
                                     </button>
