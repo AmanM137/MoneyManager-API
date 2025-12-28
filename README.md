@@ -1,16 +1,42 @@
-# React + Vite
+# MoneyManager 💸✨
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A sleek, privacy-first personal finance manager to track, visualize, and understand your money
 
-Currently, two official plugins are available:
+--- 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🎯 Quick summary
+- Track income & expenses ✅
+- Categorize transactions 🏷️
+- Visualize trends (pie, bar, line) 📈
+- Budgets & alerts 🚨
+- Export/backup (CSV / JSON) 💾
+- Offline-first & privacy minded 🔐
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+About
+-----
+MoneyManager is a lightweight app to help you log transactions, set budgets, and visualize where your money goes — with a focus on simplicity and beautiful charts. Perfect for personal use and extensible for multi-device setups.
 
-## Expanding the ESLint configuration
+Features
+--------
+- 📊 Interactive dashboard with visual charts
+- ✍️ Add/edit/delete transactions (date, amount, category)
+- 📊 Interactive charts: category breakdowns, monthly trends, cash flow
+- 🔔 Budget alerts to avoid overspending
+- 🔎 Filter by date, category, tags, accounts
+- 🔒 Secure authentication
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Tech Stack
+----------
+- Frontend: JavaScript (React) + Chart.js + Tailwind.css
+- Backend / Business logic: Java + Spring Boot
+- Storage: JSON, PostgreSql
+- Build: npm , Maven
+
+Usage Examples
+--------------
+- Add a transaction via UI -> New Transaction -> fill details
+- Import CSV with headers: date,amount,category,notes
+- View Dashboard -> Monthly summary or Category breakdown
+- Export > Download JSON/CSV for backup
