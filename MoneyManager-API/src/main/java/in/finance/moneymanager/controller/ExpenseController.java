@@ -23,13 +23,20 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExpenseDTO>> getExpenses(){
+    public ResponseEntity<List<ExpenseDTO>> getExpenses() {
         List<ExpenseDTO> expenses = expenseService.getCurrentMonthExpensesForCurrentUser();
         return ResponseEntity.status(HttpStatus.OK).body(expenses);
     }
 
+    // Update existing expense
+    @PutMapping("/{id}")
+    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable Long id, @RequestBody ExpenseDTO expenseDTO) {
+        ExpenseDTO updated = expenseService.updateExpense(id, expenseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(updated);
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteExpense(@PathVariable Long id){
+    public ResponseEntity<Void> deleteExpense(@PathVariable Long id) {
         expenseService.deleteExpense(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

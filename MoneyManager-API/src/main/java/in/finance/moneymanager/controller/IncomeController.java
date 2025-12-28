@@ -28,6 +28,7 @@ public class IncomeController {
         return ResponseEntity.status(HttpStatus.OK).body(incomes);
     }
 
+    // Update existing income
     @PutMapping("/{id}")
     public ResponseEntity<IncomeDTO> updateIncome(@PathVariable Long id, @RequestBody IncomeDTO incomeDTO) {
         IncomeDTO updated = incomeService.updateIncome(id, incomeDTO);
