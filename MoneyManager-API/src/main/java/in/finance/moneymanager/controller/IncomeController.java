@@ -23,13 +23,19 @@ public class IncomeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<IncomeDTO>> getIncomes(){
-        List<IncomeDTO> expenses = incomeService.getCurrentMonthIncomesForCurrentUser();
-        return ResponseEntity.status(HttpStatus.OK).body(expenses);
+    public ResponseEntity<List<IncomeDTO>> getIncomes() {
+        List<IncomeDTO> incomes = incomeService.getCurrentMonthIncomesForCurrentUser();
+        return ResponseEntity.status(HttpStatus.OK).body(incomes);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<IncomeDTO> updateIncome(@PathVariable Long id, @RequestBody IncomeDTO incomeDTO) {
+        IncomeDTO updated = incomeService.updateIncome(id, incomeDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteIncome(@PathVariable Long id){
+    public ResponseEntity<Void> deleteIncome(@PathVariable Long id) {
         incomeService.deleteIncome(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

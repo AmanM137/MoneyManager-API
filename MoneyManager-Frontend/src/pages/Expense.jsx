@@ -19,30 +19,18 @@ const Expense = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [openAddExpenseModal, setOpenAddExpenseModal] = useState(false);
-  const [openDeleteAlert, setOpenDeleteAlert] = useState({
-    show: false,
-    data: null,
-  });
+  const [openDeleteAlert, setOpenDeleteAlert] = useState({ show: false, data: null });
+  const [editingExpense, setEditingExpense] = useState(null);
 
-  // Fetch all expense details
   const fetchExpenseDetails = async () => {
     if (loading) return;
     setLoading(true);
     setErrorMessage("");
-
     try {
       const response = await axiosConfig.get(API_ENDPOINTS.GET_ALL_EXPENSE);
-      if (response.status === 200) {
-        const data = response.data || [];
-        if (data.length === 0) {
-          setExpenseData([]);
-          setErrorMessage("No expense records found.");
-        } else {
-          setExpenseData(data);
-        }
-      } else {
-        setErrorMessage("Failed to fetch expense details.");
-      }
+      const data = response.data || [];
+      setExpenseData(data);
+      if (data.length === 0) setErrorMessage("No expense records found.");
     } catch (error) {
       console.error("Error fetching expenses:", error);
       const message = error.response?.data?.message || "Failed to fetch expense details.";
@@ -53,64 +41,39 @@ const Expense = () => {
     }
   };
 
-  // Fetch expense categories
   const fetchExpenseCategories = async () => {
     try {
       const response = await axiosConfig.get(API_ENDPOINTS.CATEGORY_BY_TYPE("expense"));
-      if (response.status === 200) {
-        setCategories(response.data || []);
-      }
+      if (response.status === 200) setCategories(response.data || []);
     } catch (error) {
       console.error("Error fetching expense categories:", error);
       toast.error(error.response?.data?.message || "Failed to fetch expense categories.");
     }
   };
 
-  // Add new expense
-  const handleAddExpense = async (expense) => {
-    const { name, categoryId, amount, date, icon } = expense;
-
-    // Validation
-    if (!name.trim()) {
-      toast.error("Please enter a name");
-      return;
-    }
-
-    if (!categoryId) {
-      toast.error("Please select a category");
-      return;
-    }
-
-    if (!amount || isNaN(amount) || Number(amount) <= 0) {
-      toast.error("Amount should be a valid number greater than 0");
-      return;
-    }
-
-    if (!date) {
-      toast.error("Please select a date");
-      return;
-    }
-
+  const validateExpense = (expense) => {
+    const { name, categoryId, amount, date } = expense;
+    if (!name?.trim()) return toast.error("Please enter a name");
+    if (!categoryId) return toast.error("Please select a category");
+    if (!amount || isNaN(amount) || Number(amount) <= 0)
+      return toast.error("Amount should be a valid number greater than 0");
+    if (!date) return toast.error("Please select a date");
     const today = new Date().toISOString().split("T")[0];
-    if (date > today) {
-      toast.error("Date cannot be in the future");
-      return;
-    }
+    if (date > today) return toast.error("Date cannot be in the future");
+    return true;
+  };
 
+  const handleAddExpense = async (expense) => {
+    if (!validateExpense(expense)) return;
     try {
       const response = await axiosConfig.post(API_ENDPOINTS.ADD_EXPENSE, {
-        name,
-        categoryId,
-        amount: Number(amount),
-        date,
-        icon,
+        ...expense,
+        amount: Number(expense.amount),
       });
-
       if (response.status === 201) {
-        setOpenAddExpenseModal(false);
         toast.success("Expense added successfully");
+        setOpenAddExpenseModal(false);
         fetchExpenseDetails();
-        fetchExpenseCategories();
       }
     } catch (error) {
       console.error("Error adding expense:", error);
@@ -118,7 +81,24 @@ const Expense = () => {
     }
   };
 
-  // Delete expense
+  const handleUpdateExpense = async (expense) => {
+    if (!validateExpense(expense)) return;
+    try {
+      const response = await axiosConfig.put(
+        API_ENDPOINTS.UPDATE_EXPENSE(editingExpense.id),
+        { ...expense, amount: Number(expense.amount) }
+      );
+      if (response.status === 200) {
+        toast.success("Expense updated successfully");
+        setEditingExpense(null);
+        fetchExpenseDetails();
+      }
+    } catch (error) {
+      console.error("Error updating expense:", error);
+      toast.error(error.response?.data?.message || "Failed to update expense.");
+    }
+  };
+
   const deleteExpense = async (id) => {
     try {
       await axiosConfig.delete(API_ENDPOINTS.DELETE_EXPENSE(id));
@@ -131,43 +111,6 @@ const Expense = () => {
     }
   };
 
-  // Download expense data
-  const handleDownloadExpenseDetails = async () => {
-    try {
-      const response = await axiosConfig.get(API_ENDPOINTS.EXPENSE_EXCEL_DOWNLOAD, {
-        responseType: "blob",
-      });
-
-      const filename = "expense_details.xlsx";
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", filename);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      toast.success("Expense details downloaded successfully!");
-    } catch (error) {
-      console.error("Error downloading expense details:", error);
-      toast.error("Failed to download expense details. Please try again.");
-    }
-  };
-
-  // Email expense data
-  const handleEmailExpenseDetails = async () => {
-    try {
-      const response = await axiosConfig.get(API_ENDPOINTS.EMAIL_EXPENSE);
-      if (response.status === 200) {
-        toast.success("Expense details emailed successfully");
-      }
-    } catch (error) {
-      console.error("Error emailing expense details:", error);
-      toast.error("Failed to email expense details. Please try again.");
-    }
-  };
-
   useEffect(() => {
     fetchExpenseDetails();
     fetchExpenseCategories();
@@ -177,29 +120,24 @@ const Expense = () => {
     <Dashboard activeMenu="Expense">
       <div className="my-5 mx-auto">
         <div className="grid grid-cols-1 gap-6">
-          {/* Expense Overview */}
-          <div>
-            <ExpenseOverview
-              transactions={expenseData}
-              onExpenseIncome={() => setOpenAddExpenseModal(true)}
-            />
-          </div>
+          <ExpenseOverview
+            transactions={expenseData}
+            onExpenseIncome={() => setOpenAddExpenseModal(true)}
+          />
 
-          {/* Expense List or Empty Message */}
           {loading ? (
             <div className="text-center py-10 text-gray-500 font-medium">
               Loading expense data...
             </div>
           ) : errorMessage ? (
-            <div className="text-center py-10 text-gray-400 font-medium">
-              {errorMessage}
-            </div>
+            <div className="text-center py-10 text-gray-400 font-medium">{errorMessage}</div>
           ) : (
             <ExpenseList
               transactions={expenseData}
               onDelete={(id) => setOpenDeleteAlert({ show: true, data: id })}
-              onDownload={handleDownloadExpenseDetails}
-              onEmail={handleEmailExpenseDetails}
+              onDownload={() => {}}
+              onEmail={() => {}}
+              onEdit={(expense) => setEditingExpense(expense)}
             />
           )}
 
@@ -210,6 +148,19 @@ const Expense = () => {
             title="Add Expense"
           >
             <AddExpenseForm onAddExpense={handleAddExpense} categories={categories} />
+          </Modal>
+
+          {/* Edit Expense Modal */}
+          <Modal
+            isOpen={!!editingExpense}
+            onClose={() => setEditingExpense(null)}
+            title="Edit Expense"
+          >
+            <AddExpenseForm
+              onAddExpense={handleUpdateExpense}
+              categories={categories}
+              initialData={editingExpense}
+            />
           </Modal>
 
           {/* Delete Confirmation Modal */}

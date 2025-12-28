@@ -6,25 +6,21 @@ import { API_ENDPOINTS } from "../util/apiEndpoints";
 import toast from "react-hot-toast";
 import IncomeList from "../components/IncomeList";
 import Modal from "../components/Modal";
-import { Plus } from "lucide-react";
 import AddIncomeForm from "../components/AddIncomeForm";
 import DeleteAlert from "../components/DeleteAlert";
 import IncomeOverview from "../components/IncomeOverview";
 
 const Income = () => {
-
     useUser();
+
     const [incomeData, setIncomeData] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [openAddIncomeModal, setOpenAddIncomeModal] = useState(false);
-    const [openDeleteAlert, setOpenDeleteAlert] = useState({
-        show: false,
-        data: null,
-    });
+    const [openDeleteAlert, setOpenDeleteAlert] = useState({ show: false, data: null });
+    const [editingIncome, setEditingIncome] = useState(null);
 
-    // Fetch income details from API 
     const fetchIncomeDetails = async () => {
         if (loading) return;
         setLoading(true);
@@ -32,18 +28,9 @@ const Income = () => {
 
         try {
             const response = await axiosConfig.get(API_ENDPOINTS.GET_ALL_INCOMES);
-
-            if (response.status === 200) {
-                const data = response.data || [];
-                if (data.length === 0) {
-                    setIncomeData([]);
-                    setErrorMessage("No income records found.");
-                } else {
-                    setIncomeData(data);
-                }
-            } else {
-                setErrorMessage("Failed to fetch income details.");
-            }
+            const data = response.data || [];
+            setIncomeData(data);
+            if (data.length === 0) setErrorMessage("No income records found.");
         } catch (error) {
             console.error("Error fetching incomes:", error);
             const message = error.response?.data?.message || "Failed to fetch income details.";
@@ -54,64 +41,24 @@ const Income = () => {
         }
     };
 
-    // Fetch categories for income
     const fetchIncomeCategories = async () => {
         try {
             const response = await axiosConfig.get(API_ENDPOINTS.CATEGORY_BY_TYPE("income"));
-            if (response.status === 200) {
-                setCategories(response.data || []);
-            }
+            if (response.status === 200) setCategories(response.data || []);
         } catch (error) {
             console.error("Error fetching categories:", error);
             toast.error(error.response?.data?.message || "Failed to fetch income categories.");
         }
     };
 
-    // Save new income details
     const handleAddIncome = async (income) => {
-        const { name, amount, date, icon, categoryId } = income;
-
-        // Validation
-        if (!name.trim()) {
-            toast.error("Please enter a name");
-            return;
-        }
-
-        if (!amount || isNaN(amount) || Number(amount) <= 0) {
-            toast.error("Amount should be a valid number greater than 0");
-            return;
-        }
-
-        if (!date) {
-            toast.error("Please select a date");
-            return;
-        }
-
-        const today = new Date().toISOString().split("T")[0];
-        if (date > today) {
-            toast.error("Date cannot be in the future");
-            return;
-        }
-
-        if (!categoryId) {
-            toast.error("Please select a category");
-            return;
-        }
-
+        if (!validateIncome(income)) return;
         try {
-            const response = await axiosConfig.post(API_ENDPOINTS.ADD_INCOME, {
-                name,
-                amount: Number(amount),
-                date,
-                icon,
-                categoryId,
-            });
-
+            const response = await axiosConfig.post(API_ENDPOINTS.ADD_INCOME, income);
             if (response.status === 201) {
-                setOpenAddIncomeModal(false);
                 toast.success("Income added successfully");
+                setOpenAddIncomeModal(false);
                 fetchIncomeDetails();
-                fetchIncomeCategories();
             }
         } catch (error) {
             console.error("Error adding income:", error);
@@ -119,7 +66,21 @@ const Income = () => {
         }
     };
 
-    // Delete income details
+    const handleUpdateIncome = async (income) => {
+        if (!validateIncome(income)) return;
+        try {
+            const response = await axiosConfig.put(API_ENDPOINTS.UPDATE_INCOME(editingIncome.id), income);
+            if (response.status === 200) {
+                toast.success("Income updated successfully");
+                setEditingIncome(null);
+                fetchIncomeDetails();
+            }
+        } catch (error) {
+            console.error("Error updating income:", error);
+            toast.error(error.response?.data?.message || "Failed to update income");
+        }
+    };
+
     const deleteIncome = async (id) => {
         try {
             await axiosConfig.delete(API_ENDPOINTS.DELETE_INCOME(id));
@@ -132,39 +93,16 @@ const Income = () => {
         }
     };
 
-    // Download income details as Excel
-    const handleDownloadIncomeDetails = async () => {
-        try {
-            const response = await axiosConfig.get(API_ENDPOINTS.INCOME_EXCEL_DONWLOAD, {
-                responseType: "blob",
-            });
-            const filename = "income_details.xlsx";
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", filename);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-            window.URL.revokeObjectURL(url);
-            toast.success("Income details downloaded successfully");
-        } catch (error) {
-            console.error("Error downloading income:", error);
-            toast.error(error.response?.data?.message || "Failed to download income details");
-        }
-    };
-
-    // Email income details
-    const handleEmailIncomeDetails = async () => {
-        try {
-            const response = await axiosConfig.get(API_ENDPOINTS.EMAIL_INCOME);
-            if (response.status === 200) {
-                toast.success("Income details emailed successfully");
-            }
-        } catch (error) {
-            console.error("Error emailing income:", error);
-            toast.error(error.response?.data?.message || "Failed to email income details");
-        }
+    const validateIncome = (income) => {
+        const { name, amount, date, categoryId } = income;
+        if (!name?.trim()) return toast.error("Please enter a name");
+        if (!amount || isNaN(amount) || Number(amount) <= 0)
+            return toast.error("Amount should be a valid number greater than 0");
+        if (!date) return toast.error("Please select a date");
+        const today = new Date().toISOString().split("T")[0];
+        if (date > today) return toast.error("Date cannot be in the future");
+        if (!categoryId) return toast.error("Please select a category");
+        return true;
     };
 
     useEffect(() => {
@@ -176,15 +114,11 @@ const Income = () => {
         <Dashboard activeMenu="Income">
             <div className="my-5 mx-auto">
                 <div className="grid grid-cols-1 gap-6">
-                    {/* Income Overview */}
-                    <div>
-                        <IncomeOverview
-                            transactions={incomeData}
-                            onAddIncome={() => setOpenAddIncomeModal(true)}
-                        />
-                    </div>
+                    <IncomeOverview
+                        transactions={incomeData}
+                        onAddIncome={() => setOpenAddIncomeModal(true)}
+                    />
 
-                    {/* Income List or Empty Message */}
                     {loading ? (
                         <div className="text-center py-10 text-gray-500 font-medium">
                             Loading income data...
@@ -197,8 +131,9 @@ const Income = () => {
                         <IncomeList
                             transactions={incomeData}
                             onDelete={(id) => setOpenDeleteAlert({ show: true, data: id })}
-                            onDownload={handleDownloadIncomeDetails}
-                            onEmail={handleEmailIncomeDetails}
+                            onDownload={() => {}}
+                            onEmail={() => {}}
+                            onEdit={(income) => setEditingIncome(income)}
                         />
                     )}
 
@@ -206,11 +141,21 @@ const Income = () => {
                     <Modal
                         isOpen={openAddIncomeModal}
                         onClose={() => setOpenAddIncomeModal(false)}
-                        title={"Add Income"}
+                        title="Add Income"
+                    >
+                        <AddIncomeForm onAddIncome={handleAddIncome} categories={categories} />
+                    </Modal>
+
+                    {/* Edit Income Modal */}
+                    <Modal
+                        isOpen={!!editingIncome}
+                        onClose={() => setEditingIncome(null)}
+                        title="Edit Income"
                     >
                         <AddIncomeForm
-                            onAddIncome={(income) => handleAddIncome(income)}
+                            onAddIncome={handleUpdateIncome}
                             categories={categories}
+                            initialData={editingIncome}
                         />
                     </Modal>
 
@@ -218,10 +163,10 @@ const Income = () => {
                     <Modal
                         isOpen={openDeleteAlert.show}
                         onClose={() => setOpenDeleteAlert({ show: false, data: null })}
-                        title={"Delete Income"}
+                        title="Delete Income"
                     >
                         <DeleteAlert
-                            content={"Are you sure you want to delete this income detail?"}
+                            content="Are you sure you want to delete this income detail?"
                             onDelete={() => deleteIncome(openDeleteAlert.data)}
                         />
                     </Modal>

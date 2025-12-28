@@ -1,11 +1,9 @@
-import { Download, LoaderCircle, Mail } from "lucide-react"
-import TransactionInfoCard from "./TransactionInfoCard"
-import moment from "moment"
-import { useState } from "react"
+import { Download, LoaderCircle, Mail } from "lucide-react";
+import TransactionInfoCard from "./TransactionInfoCard";
+import moment from "moment";
+import { useState } from "react";
 
-
-const IncomeList = ({ transactions, onDelete, onDownload, onEmail }) => {
-
+const IncomeList = ({ transactions, onDelete, onDownload, onEmail, onEdit }) => {
     const [emailLoading, setEmailLoading] = useState(false);
     const [downloadLoading, setDownloadLoading] = useState(false);
 
@@ -16,7 +14,7 @@ const IncomeList = ({ transactions, onDelete, onDownload, onEmail }) => {
         } finally {
             setEmailLoading(false);
         }
-    }
+    };
 
     const handleDownload = async () => {
         setDownloadLoading(true);
@@ -25,13 +23,12 @@ const IncomeList = ({ transactions, onDelete, onDownload, onEmail }) => {
         } finally {
             setDownloadLoading(false);
         }
-    }
-
+    };
 
     return (
         <div className="bg-white rounded-xl shadow-md border border-gray-100 p-5 space-y-4">
             <div className="flex items-center justify-between">
-                <h5 className="text-lg">Income Sources</h5>
+                <h5 className="text-lg font-semibold">Income Sources</h5>
                 <div className="flex items-center justify-end gap-2">
                     <button
                         onClick={handleEmail}
@@ -44,7 +41,7 @@ const IncomeList = ({ transactions, onDelete, onDownload, onEmail }) => {
                             </>
                         ) : (
                             <>
-                                <Mail size={15} className="text-base" />Email
+                                <Mail size={15} /> Email
                             </>
                         )}
                     </button>
@@ -59,7 +56,7 @@ const IncomeList = ({ transactions, onDelete, onDownload, onEmail }) => {
                             </>
                         ) : (
                             <>
-                                <Download size={15} className="text-base" />Download
+                                <Download size={15} /> Download
                             </>
                         )}
                     </button>
@@ -67,21 +64,21 @@ const IncomeList = ({ transactions, onDelete, onDownload, onEmail }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2">
-                {/* Display the incomes */}
                 {transactions?.map((income) => (
                     <TransactionInfoCard
                         key={income.id}
                         title={income.name}
                         icon={income.icon}
-                        date={moment(income.date).format('Do MMM YYYY')}
+                        date={moment(income.date).format("Do MMM YYYY")}
                         amount={income.amount}
                         type={"income"}
                         onDelete={() => onDelete(income.id)}
+                        onEdit={() => onEdit(income)}
                     />
                 ))}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default IncomeList
+export default IncomeList;
