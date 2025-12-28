@@ -220,20 +220,19 @@ const Filter = () => {
                 >
                     {editTransaction?.transactionType === "income" ? (
                         <AddIncomeForm
-                            onAddIncome={(data) =>
-                                handleUpdate({ ...editTransaction, ...data })
-                            }
+                            onAddIncome={(data) => handleUpdate({ ...editTransaction, ...data })}
                             categories={[]}
+                            initialData={editTransaction}
                         />
                     ) : (
                         <AddExpenseForm
-                            onAddExpense={(data) =>
-                                handleUpdate({ ...editTransaction, ...data })
-                            }
+                            onAddExpense={(data) => handleUpdate({ ...editTransaction, ...data })}
                             categories={[]}
+                            initialData={editTransaction}
                         />
                     )}
                 </Modal>
+
 
                 {/* Delete Modal */}
                 <Modal
