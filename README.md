@@ -43,6 +43,5 @@ Tech Stack
 Usage Examples
 --------------
 - Add a transaction via UI -> New Transaction -> fill details
-- Import CSV with headers: date,amount,category,notes
 - View Dashboard -> Monthly summary or Category breakdown
 - Export > Download JSON/CSV for backup
