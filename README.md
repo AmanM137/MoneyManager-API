@@ -6,6 +6,8 @@ A sleek, privacy-first personal finance manager to track, visualize, and underst
 
 ## 🌐 App Link :- [Money Manager](https://money-manager-ten-theta.vercel.app/)
 
+## 🌐 API Documentation :- [Money Manager API](https://moneymanager-api-vf2f.onrender.com/api/v1.0/swagger-ui/index.html)
+
 --- 
 
 🎯 Quick summary
